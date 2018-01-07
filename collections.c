@@ -231,11 +231,9 @@ int buffer_append(buffer_t buffer, const unsigned char *data, int len, int max_s
             }
             len = new_size - buffer->pos;
             if (len > 0) {
-                if ((new_size > buffer->size) && !(buffer->data = realloc(buffer->data, new_size + 1))) {
+                if ((new_size > buffer->size) && !buffer_resize(buffer, new_size)) {
                     return UTILS_ERR_OUT_OF_MEMORY;
                 }
-                memset(buffer->data + buffer->pos, 0, len + 1);
-                buffer->size = new_size;
             }
         }
     }
@@ -248,6 +246,28 @@ int buffer_append(buffer_t buffer, const unsigned char *data, int len, int max_s
         buffer->pos+= len;
     }
     return len;
+}
+
+int buffer_resize(buffer_t buffer, int new_size) {
+    if (new_size > buffer->size) {
+        if (!(buffer->data = realloc(buffer->data, new_size + 1))) {
+            return UTILS_ERR_OUT_OF_MEMORY;
+        }
+        memset(buffer->data + buffer->size, 0, new_size - buffer->size + 1);
+        buffer->size = new_size;
+    }
+    return UTILS_ERR_OK;
+}
+
+int buffer_growby(buffer_t buffer, int amount, int max_size) {
+    if (amount < 1) {
+        return UTILS_ERR_OK;        
+    }
+    int new_size = buffer->size + amount;
+    if (max_size > 0 && new_size > max_size) {
+        return UTILS_ERR_OUT_OF_MEMORY;
+    }
+    return buffer_resize(buffer, new_size);
 }
 
 int buffer_get_length(buffer_t buffer) {

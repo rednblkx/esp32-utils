@@ -70,6 +70,8 @@ typedef struct _buffer *buffer_t;
 buffer_t buffer_new(int size);
 // Size of the useful data. Doesn't include a string \0 terminator
 int buffer_append(buffer_t buffer, const unsigned char *data, int len, int max_size);
+int buffer_resize(buffer_t buffer, int new_size);
+int buffer_growby(buffer_t buffer, int amount, int max_size);
 int buffer_get_length(buffer_t buffer);
 // If data is a string, it is \0 terminated
 const unsigned char *buffer_get_data(buffer_t buffer);

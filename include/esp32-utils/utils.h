@@ -33,6 +33,12 @@ extern "C" {
 #ifndef _ESP32_UTILS_H_
 #define _ESP32_UTILS_H_
 
+#define UTILS_VERSION_MAJ                 0
+#define UTILS_VERSION_MIN                 1
+#define UTILS_VERSION_REV                 0
+#define UTILS_VERSION_STR                 "0.1.0"
+#define UTILS_VERSION_CHK(maj, min)       ((maj==UTILS_VERSION_MAJ) && (min<=UTILS_VERSION_MIN))
+
 #define UTILS_ERR_OK                        0
 #define UTILS_ERR_ALLOC_FAILED              -0x1004
 #define UTILS_ERR_OUT_OF_MEMORY             UTILS_ERR_ALLOC_FAILED
