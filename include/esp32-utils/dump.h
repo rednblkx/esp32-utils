@@ -33,9 +33,11 @@ extern "C" {
 #ifndef _UTILS_DUMP_H_
 #define _UTILS_DUMP_H_
 
+#include "esp32-utils/utils.h"
+
 void dump_data(const void *data, size_t size, const char *description);
 void dump_string(const char *string, const char *description);
-void dump_big_number(const void *big_number, const char *description);
+void dump_big_number(mbedtls_mpi *big_number, const char *description);
 
 #endif
 #ifdef __cplusplus

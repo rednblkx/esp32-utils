@@ -26,10 +26,7 @@
  *
  */
 
-#include "freertos/FreeRTOS.h"
-#include <string.h>
-#include "mbedtls/bignum.h"
-#include "esp32-utils/utils.h"
+#include "esp32-utils/dump.h"
 
 void dump_data(const void* data, size_t size, const char *description) {
 	char ascii[17];
@@ -78,15 +75,15 @@ void dump_string(const char *string, const char *description) {
 	dump_data(string, size, description);
 }
 
-void dump_big_number(const void *big_number, const char *description) {
+void dump_big_number(mbedtls_mpi *big_number, const char *description) {
 	if (!big_number) {
 		dump_data(NULL, 0, description);
 		return;
 	}
 	unsigned char *bytes_bn; int len_bn;
-	len_bn   = mbedtls_mpi_size((mbedtls_mpi *)big_number);
+	len_bn   = mbedtls_mpi_size(big_number);
 	bytes_bn = malloc(len_bn);
-	mbedtls_mpi_write_binary(big_number, (unsigned char *)bytes_bn, len_bn);
+	mbedtls_mpi_write_binary(big_number, bytes_bn, len_bn);
 	dump_data(bytes_bn, len_bn, description);
 	free(bytes_bn);
 }

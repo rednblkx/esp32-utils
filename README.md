@@ -10,6 +10,8 @@ Installation
 
 Extract or clone the module directly into the components directory of your project
 
+```git clone https://github.com/ifullgaz/esp32-utils```
+
 Test
 ----
 
@@ -19,4 +21,4 @@ Simply run ```make flash``` to run on a connected esp32 board.
 Usage
 -----
 
-Please look at the test source file for an example.
+Please look at the test source file for an example. (TODO)

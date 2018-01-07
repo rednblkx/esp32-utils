@@ -33,6 +33,10 @@ extern "C" {
 #ifndef _UTILS_COLLECTIONS_H_
 #define _UTILS_COLLECTIONS_H_
 
+#include "esp32-utils/utils.h"
+
+#define UTILS_BUFFER_NO_LIMIT       -1
+
 /***********************************************************************************************************
  * Array
  ***********************************************************************************************************/
@@ -69,12 +73,14 @@ typedef struct _buffer *buffer_t;
 
 buffer_t buffer_new(int size);
 // Size of the useful data. Doesn't include a string \0 terminator
-int buffer_append(buffer_t buffer, const unsigned char *data, int len, int max_size);
-int buffer_resize(buffer_t buffer, int new_size);
-int buffer_growby(buffer_t buffer, int amount, int max_size);
 int buffer_get_length(buffer_t buffer);
 // If data is a string, it is \0 terminated
 const unsigned char *buffer_get_data(buffer_t buffer);
+int buffer_append(buffer_t buffer, const unsigned char *data, int len);
+int buffer_append_string(buffer_t buffer, const char *data);
+int buffer_append_buffer(buffer_t buffer, const buffer_t data);
+int buffer_append_mpi(buffer_t buffer, mbedtls_mpi *data);
+int buffer_ensure_available(buffer_t buffer, int len);
 void buffer_free(void *p);
 
 #endif

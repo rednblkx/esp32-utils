@@ -26,10 +26,7 @@
  *
  */
 
-#include "freertos/FreeRTOS.h"
-#include <string.h>
-#include "errno.h"
-#include "esp32-utils/utils.h"
+#include "esp32-utils/collections.h"
 
 /***********************************************************************************************************
  * Array
@@ -202,6 +199,23 @@ struct _buffer {
     unsigned char *data;
 };
 
+/***********************************************************************************************************
+ * Private interface
+ ***********************************************************************************************************/
+static int buffer_resize(buffer_t buffer, int new_size) {
+    if (new_size > buffer->size) {
+        if (!(buffer->data = realloc(buffer->data, new_size + 1))) {
+            return UTILS_ERR_OUT_OF_MEMORY;
+        }
+        memset(buffer->data + buffer->size, 0, new_size - buffer->size + 1);
+        buffer->size = new_size;
+    }
+    return UTILS_ERR_OK;
+}
+
+/***********************************************************************************************************
+ * Public interface
+ ***********************************************************************************************************/
 buffer_t buffer_new(int size) {
     buffer_t buffer;
     if (!(buffer = (buffer_t)malloc(sizeof(struct _buffer)))) {
@@ -219,63 +233,54 @@ cleanup:
     return NULL;
 }
 
-// If max_size <= 0 the buffer will not resize automatically
-// If max_size > current size, the buffer will resize automatically up to max_size.
-// Return number of bytes written or UTILS_ERR_OUT_OF_MEMORY if realloc failed
-int buffer_append(buffer_t buffer, const unsigned char *data, int len, int max_size) {
-    if (max_size > 0) {
-        if (buffer->pos + len > buffer->size) {
-            int new_size = buffer->pos + len;
-            if (new_size > max_size) {
-                new_size = max_size;
-            }
-            len = new_size - buffer->pos;
-            if (len > 0) {
-                if ((new_size > buffer->size) && !buffer_resize(buffer, new_size)) {
-                    return UTILS_ERR_OUT_OF_MEMORY;
-                }
-            }
-        }
-    }
-    else {
-        int max_len = buffer->size - buffer->pos;
-        len = (len < max_len) ? len : max_len;
-    }
-    if (len > 0) {
-        memcpy(buffer->data + buffer->pos, data, len);
-        buffer->pos+= len;
-    }
-    return len;
-}
-
-int buffer_resize(buffer_t buffer, int new_size) {
-    if (new_size > buffer->size) {
-        if (!(buffer->data = realloc(buffer->data, new_size + 1))) {
-            return UTILS_ERR_OUT_OF_MEMORY;
-        }
-        memset(buffer->data + buffer->size, 0, new_size - buffer->size + 1);
-        buffer->size = new_size;
-    }
-    return UTILS_ERR_OK;
-}
-
-int buffer_growby(buffer_t buffer, int amount, int max_size) {
-    if (amount < 1) {
-        return UTILS_ERR_OK;        
-    }
-    int new_size = buffer->size + amount;
-    if (max_size > 0 && new_size > max_size) {
-        return UTILS_ERR_OUT_OF_MEMORY;
-    }
-    return buffer_resize(buffer, new_size);
-}
-
 int buffer_get_length(buffer_t buffer) {
     return buffer->pos;
 }
 
 const unsigned char *buffer_get_data(buffer_t buffer) {
     return buffer->data;
+}
+
+// If max_size <= 0 the buffer will not resize automatically
+// If max_size > current size, the buffer will resize automatically up to max_size.
+// Return number of bytes written or UTILS_ERR_OUT_OF_MEMORY if realloc failed
+int buffer_append(buffer_t buffer, const unsigned char *data, int len) {
+    int ret;
+    if (!(ret = buffer_ensure_available(buffer, len))) {
+        memcpy(buffer->data + buffer->pos, data, len);
+        buffer->pos+= len;
+    }
+    return ret;
+}
+
+int buffer_append_string(buffer_t buffer, const char *data) {
+    return buffer_append(buffer, (const unsigned char *)data, strlen(data));
+}
+
+int buffer_append_buffer(buffer_t buffer, const buffer_t data) {
+    return buffer_append(buffer, buffer_get_data(data), buffer_get_length(data));
+}
+
+int buffer_append_mpi(buffer_t buffer, mbedtls_mpi *data) {
+    int ret;
+    int mpi_size = mbedtls_mpi_size(data);
+    if (!(ret = buffer_ensure_available(buffer, mpi_size))) {
+        mbedtls_mpi_write_binary(data, buffer->data + buffer->pos, mpi_size);
+        buffer->pos+= mpi_size;
+    }
+    return ret;
+}
+
+int buffer_ensure_available(buffer_t buffer, int len) {
+    int available = buffer->size - buffer->pos;
+    // Buffer was created with no resizing
+    if (len > available) {
+        int new_size = buffer->pos + len;
+        if (buffer_resize(buffer, new_size) != UTILS_ERR_OK) {
+            return UTILS_ERR_OUT_OF_MEMORY;
+        }
+    };
+    return UTILS_ERR_OK;
 }
 
 void buffer_free(void *p) {

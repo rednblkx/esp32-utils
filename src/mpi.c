@@ -26,34 +26,23 @@
  *
  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef _ESP32_UTILS_H_
-#define _ESP32_UTILS_H_
-
-#define UTILS_VERSION_MAJ                 0
-#define UTILS_VERSION_MIN                 2
-#define UTILS_VERSION_REV                 0
-#define UTILS_VERSION_STR                 "0.2.0"
-#define UTILS_VERSION_CHK(maj, min)       ((maj==UTILS_VERSION_MAJ) && (min<=UTILS_VERSION_MIN))
-
-#define UTILS_ERR_OK                        0
-#define UTILS_ERR_ALLOC_FAILED              -0x1004
-#define UTILS_ERR_OUT_OF_MEMORY             UTILS_ERR_ALLOC_FAILED
-#define UTILS_ERR_BUFFER_TOO_SMALL          -0x1006
-
-#include "freertos/FreeRTOS.h"
-#include <string.h>
-#include "mbedtls/bignum.h"
-#include "errno.h"
-#include "esp32-utils/dump.h"
-#include "esp32-utils/collections.h"
 #include "esp32-utils/mpi.h"
+#include "errno.h"
 
-#endif
-#ifdef __cplusplus
+mbedtls_mpi *utils_mpi_new(void) {
+    mbedtls_mpi *mpi = NULL;
+    if (!(mpi = (mbedtls_mpi *)malloc(sizeof(mbedtls_mpi)))) {
+        return NULL;
+    }
+    mbedtls_mpi_init(mpi);
+    return mpi;
 }
-#endif
+
+void utils_mpi_free(void *m) {
+    mbedtls_mpi *mpi = (mbedtls_mpi *)m;
+    if (mpi) {
+   	  mbedtls_mpi_free(mpi);
+   	  free(mpi);
+    }
+}
 
