@@ -288,7 +288,6 @@ int buffer_resize(buffer_t buffer, int new_size) {
 void buffer_reset(buffer_t buffer) {
     buffer->pos = 0;
     memset(buffer->data, 0, buffer->size);
-    return UTILS_ERR_OK;
 }
 
 void buffer_free(void *p) {
