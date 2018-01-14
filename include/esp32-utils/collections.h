@@ -81,6 +81,8 @@ int buffer_append_string(buffer_t buffer, const char *data);
 int buffer_append_buffer(buffer_t buffer, const buffer_t data);
 int buffer_append_mpi(buffer_t buffer, mbedtls_mpi *data);
 int buffer_ensure_available(buffer_t buffer, int len);
+int buffer_resize(buffer_t buffer, int new_len);
+void buffer_reset(buffer_t buffer);
 void buffer_free(void *p);
 
 #endif

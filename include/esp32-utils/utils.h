@@ -35,8 +35,8 @@ extern "C" {
 
 #define UTILS_VERSION_MAJ                 0
 #define UTILS_VERSION_MIN                 2
-#define UTILS_VERSION_REV                 0
-#define UTILS_VERSION_STR                 "0.2.0"
+#define UTILS_VERSION_REV                 1
+#define UTILS_VERSION_STR                 "0.2.1"
 #define UTILS_VERSION_CHK(maj, min)       ((maj==UTILS_VERSION_MAJ) && (min<=UTILS_VERSION_MIN))
 
 #define UTILS_ERR_OK                        0
@@ -48,9 +48,9 @@ extern "C" {
 #include <string.h>
 #include "mbedtls/bignum.h"
 #include "errno.h"
-#include "esp32-utils/dump.h"
 #include "esp32-utils/collections.h"
 #include "esp32-utils/mpi.h"
+#include "esp32-utils/dump.h"
 
 #endif
 #ifdef __cplusplus

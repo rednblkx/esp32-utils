@@ -200,20 +200,6 @@ struct _buffer {
 };
 
 /***********************************************************************************************************
- * Private interface
- ***********************************************************************************************************/
-static int buffer_resize(buffer_t buffer, int new_size) {
-    if (new_size > buffer->size) {
-        if (!(buffer->data = realloc(buffer->data, new_size + 1))) {
-            return UTILS_ERR_OUT_OF_MEMORY;
-        }
-        memset(buffer->data + buffer->size, 0, new_size - buffer->size + 1);
-        buffer->size = new_size;
-    }
-    return UTILS_ERR_OK;
-}
-
-/***********************************************************************************************************
  * Public interface
  ***********************************************************************************************************/
 buffer_t buffer_new(int size) {
@@ -280,6 +266,28 @@ int buffer_ensure_available(buffer_t buffer, int len) {
             return UTILS_ERR_OUT_OF_MEMORY;
         }
     };
+    return UTILS_ERR_OK;
+}
+
+int buffer_resize(buffer_t buffer, int new_size) {
+    if (new_size < 0) {
+        return UTILS_ERR_OUT_OF_MEMORY;        
+    }
+    if (!(buffer->data = realloc(buffer->data, new_size + 1))) {
+        return UTILS_ERR_OUT_OF_MEMORY;
+    }
+    bool is_shrunk = (new_size < buffer->size);
+    int zero_len = is_shrunk ? 1 : new_size - buffer->size + 1;
+    int zero_offset = is_shrunk ? new_size : buffer->size;
+    memset(buffer->data + zero_offset, 0, zero_len);
+    buffer->size = new_size;
+    buffer->pos = (buffer->pos > new_size) ? new_size : buffer->pos;
+    return UTILS_ERR_OK;
+}
+
+void buffer_reset(buffer_t buffer) {
+    buffer->pos = 0;
+    memset(buffer->data, 0, buffer->size);
     return UTILS_ERR_OK;
 }
 

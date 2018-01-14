@@ -35,9 +35,12 @@ extern "C" {
 
 #include "esp32-utils/utils.h"
 
+typedef struct _buffer *buffer_t;
+
 void dump_data(const void *data, size_t size, const char *description);
 void dump_string(const char *string, const char *description);
 void dump_big_number(mbedtls_mpi *big_number, const char *description);
+void dump_buffer(buffer_t buffer, const char *description);
 
 #endif
 #ifdef __cplusplus

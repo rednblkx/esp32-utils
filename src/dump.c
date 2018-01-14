@@ -88,3 +88,7 @@ void dump_big_number(mbedtls_mpi *big_number, const char *description) {
 	free(bytes_bn);
 }
 
+void dump_buffer(buffer_t buffer, const char *description) {
+    dump_data(buffer_get_data(buffer), buffer_get_length(buffer), description);
+}
+
