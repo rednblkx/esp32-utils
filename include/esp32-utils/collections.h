@@ -74,7 +74,7 @@ typedef struct _buffer *buffer_t;
 buffer_t buffer_new(int size);
 buffer_t buffer_new_from_data(unsigned char *data, int size);
 buffer_t buffer_new_from_string(char *string);
-buffer_t clone(buffer_t buffer);
+buffer_t buffer_clone(buffer_t buffer);
 // Size of the useful data. Doesn't include a string \0 terminator
 int buffer_get_length(buffer_t buffer);
 // If data is a string, it is \0 terminated

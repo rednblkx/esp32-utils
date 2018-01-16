@@ -232,7 +232,7 @@ buffer_t buffer_new_from_string(char *string) {
     return buffer_new_from_data((unsigned char *)string, strlen(string));
 }
 
-buffer_t clone(buffer_t buffer) {
+buffer_t buffer_clone(buffer_t buffer) {
     buffer_t clone = buffer_new(buffer_get_length(buffer));
     buffer_append_buffer(clone, buffer);
     return clone;
