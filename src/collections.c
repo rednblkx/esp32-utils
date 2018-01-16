@@ -215,6 +215,7 @@ buffer_t buffer_new_from_data(unsigned char *data, int size) {
     memset(buffer, 0, sizeof(struct _buffer));
     if (data) {
         buffer->data = data;
+        buffer->pos = size;
     }
     else if ((buffer->data = malloc(size + 1))) {
         memset(buffer->data, 0, size + 1);
@@ -230,6 +231,18 @@ buffer_t buffer_new_from_data(unsigned char *data, int size) {
 
 buffer_t buffer_new_from_string(char *string) {
     return buffer_new_from_data((unsigned char *)string, strlen(string));
+}
+
+buffer_t buffer_new_from_mpi(mbedtls_mpi *mpi) {
+    unsigned char *mpi_data;
+    int mpi_size = mbedtls_mpi_size(data);
+    mpi_data = (unsigned char)malloc(sizeof(unsigned char) * mpi_size);
+    if (!mpi_data) {
+        errno = UTILS_ERR_ALLOC_FAILED;
+        return NULL;
+    }
+    mbedtls_mpi_write_binary(mpi, mpi_data, mpi_size);
+    return buffer_new_from_data(mpi_data, mpi_size);
 }
 
 buffer_t buffer_clone(buffer_t buffer) {
