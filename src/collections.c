@@ -235,7 +235,7 @@ buffer_t buffer_new_from_string(char *string) {
 
 buffer_t buffer_new_from_mpi(mbedtls_mpi *mpi) {
     unsigned char *mpi_data;
-    int mpi_size = mbedtls_mpi_size(data);
+    int mpi_size = mbedtls_mpi_size(mpi);
     mpi_data = (unsigned char)malloc(sizeof(unsigned char) * mpi_size);
     if (!mpi_data) {
         errno = UTILS_ERR_ALLOC_FAILED;
