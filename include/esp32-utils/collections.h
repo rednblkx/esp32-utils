@@ -72,10 +72,15 @@ array_t map_values(map_t map);
 typedef struct _buffer *buffer_t;
 
 buffer_t buffer_new(int size);
+buffer_t buffer_new_from_data(unsigned char *data, int size);
+buffer_t buffer_new_from_string(char *string);
+buffer_t clone(buffer_t buffer);
 // Size of the useful data. Doesn't include a string \0 terminator
 int buffer_get_length(buffer_t buffer);
 // If data is a string, it is \0 terminated
 const unsigned char *buffer_get_data(buffer_t buffer);
+// Detach the data buffer form the buffer object. Caller is responsible for freeing
+unsigned char *buffer_detach_data(buffer_t buffer);
 int buffer_append(buffer_t buffer, const unsigned char *data, int len);
 int buffer_append_string(buffer_t buffer, const char *data);
 int buffer_append_buffer(buffer_t buffer, const buffer_t data);

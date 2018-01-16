@@ -203,20 +203,39 @@ struct _buffer {
  * Public interface
  ***********************************************************************************************************/
 buffer_t buffer_new(int size) {
+    return buffer_new_from_data(NULL, size);
+}
+
+buffer_t buffer_new_from_data(unsigned char *data, int size) {
     buffer_t buffer;
     if (!(buffer = (buffer_t)malloc(sizeof(struct _buffer)))) {
+        errno = UTILS_ERR_ALLOC_FAILED;
         return NULL;
     }
     memset(buffer, 0, sizeof(struct _buffer));
-    if (!(buffer->data = malloc(size + 1))) {
-        goto cleanup;
+    if (data) {
+        buffer->data = data;
     }
-    memset(buffer->data, 0, size + 1);
+    else if ((buffer->data = malloc(size + 1))) {
+        memset(buffer->data, 0, size + 1);
+    }
+    else {
+        errno = UTILS_ERR_ALLOC_FAILED;
+        free(buffer);
+        return NULL;
+    }
     buffer->size = size;
     return buffer;
-cleanup:
-    buffer_free(buffer);
-    return NULL;
+}
+
+buffer_t buffer_new_from_string(char *string) {
+    return buffer_new_from_data((unsigned char *)string, strlen(string));
+}
+
+buffer_t clone(buffer_t buffer) {
+    buffer_t clone = buffer_new(buffer_get_length(buffer));
+    buffer_append_buffer(clone, buffer);
+    return clone;
 }
 
 int buffer_get_length(buffer_t buffer) {
@@ -225,6 +244,14 @@ int buffer_get_length(buffer_t buffer) {
 
 const unsigned char *buffer_get_data(buffer_t buffer) {
     return buffer->data;
+}
+
+unsigned char *buffer_detach_data(buffer_t buffer) {
+    unsigned char *data = buffer->data;
+    buffer->data = NULL;
+    buffer->pos = 0;
+    buffer->size = 0;
+    return data;
 }
 
 // If max_size <= 0 the buffer will not resize automatically
@@ -287,13 +314,15 @@ int buffer_resize(buffer_t buffer, int new_size) {
 
 void buffer_reset(buffer_t buffer) {
     buffer->pos = 0;
-    memset(buffer->data, 0, buffer->size);
+    if (buffer->data) {
+        memset(buffer->data, 0, buffer->size);
+    }
 }
 
 void buffer_free(void *p) {
     buffer_t buffer = (buffer_t)p;
     if (buffer) {
-        free(buffer->data);
+        if (buffer->data) free(buffer->data);
         free(p);
     }
 }
