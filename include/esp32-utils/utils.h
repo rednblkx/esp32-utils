@@ -35,8 +35,8 @@ extern "C" {
 
 #define UTILS_VERSION_MAJ                 0
 #define UTILS_VERSION_MIN                 2
-#define UTILS_VERSION_REV                 4
-#define UTILS_VERSION_STR                 "0.2.4"
+#define UTILS_VERSION_REV                 5
+#define UTILS_VERSION_STR                 "0.2.5"
 #define UTILS_VERSION_CHK(maj, min)       ((maj==UTILS_VERSION_MAJ) && (min<=UTILS_VERSION_MIN))
 
 #define UTILS_ERR_OK                        0

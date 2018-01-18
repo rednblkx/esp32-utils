@@ -60,6 +60,7 @@ typedef struct _map *map_t;
 
 map_t map_new(element_free *free_callback);
 void map_free(void *m);
+int map_count(map_t map);
 void *map_value_for_key(map_t map, const char *key);
 void *map_set_value_for_key(map_t map, const char *key, void *value);
 void *map_remove_key(map_t map, const char *key, void *value);

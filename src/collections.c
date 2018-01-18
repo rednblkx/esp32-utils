@@ -91,9 +91,8 @@ void *array_remove_at(array_t array, int index) {
         for (int i = index; i < array->count - 1; i++) {
             array->elements[i] = array->elements[i + 1];
         }
-        if ((array->elements = (void **)realloc(array->elements, sizeof(void *) * (--array->count)))) {
-            return element;
-        }
+        array->elements = (void **)realloc(array->elements, sizeof(void *) * (--array->count));
+        return element;
     }
     return NULL;
 }
@@ -150,6 +149,10 @@ void map_free(void *m) {
     }
 }
 
+int map_count(map_t map) {
+    return array_count(map->keys);
+}
+
 array_t map_keys(map_t map) {
     return map->keys;
 }
@@ -174,7 +177,7 @@ void *map_set_value_for_key(map_t map, const char *key, void *value) {
             return old_value;
         }
     }
-    array_push(map->keys, (void *)key);
+    array_push(map->keys, (void *)strdup(key));
     array_push(map->values, value);
     return value;
 }
@@ -182,7 +185,7 @@ void *map_set_value_for_key(map_t map, const char *key, void *value) {
 void *map_remove_key(map_t map, const char *key, void *value) {
     for (int i = 0; i < array_count(map->keys); i++) {
         if (!strcmp(array_at(map->keys, i), key)) {
-            array_remove_at(map->keys, i);
+            free(array_remove_at(map->keys, i));
             void *old_value = array_remove_at(map->values, i);
             return old_value;
         }
@@ -311,7 +314,7 @@ int buffer_ensure_available(buffer_t buffer, int len) {
 
 int buffer_resize(buffer_t buffer, int new_size) {
     if (new_size < 0) {
-        return UTILS_ERR_OUT_OF_MEMORY;        
+        return UTILS_ERR_OUT_OF_MEMORY;
     }
     if (!(buffer->data = realloc(buffer->data, new_size + 1))) {
         return UTILS_ERR_OUT_OF_MEMORY;
