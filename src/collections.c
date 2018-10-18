@@ -182,7 +182,7 @@ void *map_set_value_for_key(map_t map, const char *key, void *value) {
     return value;
 }
 
-void *map_remove_key(map_t map, const char *key, void *value) {
+void *map_remove_value_for_key(map_t map, const char *key) {
     for (int i = 0; i < array_count(map->keys); i++) {
         if (!strcmp(array_at(map->keys, i), key)) {
             free(array_remove_at(map->keys, i));
@@ -200,6 +200,7 @@ struct _buffer {
     int size;
     int pos;
     unsigned char *data;
+    bool static_data;
 };
 
 /***********************************************************************************************************
@@ -207,6 +208,14 @@ struct _buffer {
  ***********************************************************************************************************/
 buffer_t buffer_new(int size) {
     return buffer_new_from_data(NULL, size);
+}
+
+void buffer_free(void *p) {
+    buffer_t buffer = (buffer_t)p;
+    if (buffer) {
+        if (buffer->data && !buffer->static_data) free(buffer->data);
+        free(p);
+    }
 }
 
 buffer_t buffer_new_from_data(unsigned char *data, int size) {
@@ -229,6 +238,14 @@ buffer_t buffer_new_from_data(unsigned char *data, int size) {
         return NULL;
     }
     buffer->size = size;
+    return buffer;
+}
+
+buffer_t buffer_new_from_static_data(const unsigned char *data, int size) {
+    buffer_t buffer = buffer_new_from_data((unsigned char *)data, size);
+    if (buffer) {
+        buffer->static_data = true;
+    }
     return buffer;
 }
 
@@ -332,13 +349,5 @@ void buffer_reset(buffer_t buffer) {
     buffer->pos = 0;
     if (buffer->data) {
         memset(buffer->data, 0, buffer->size);
-    }
-}
-
-void buffer_free(void *p) {
-    buffer_t buffer = (buffer_t)p;
-    if (buffer) {
-        if (buffer->data) free(buffer->data);
-        free(p);
     }
 }

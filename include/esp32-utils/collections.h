@@ -63,7 +63,7 @@ void map_free(void *m);
 int map_count(map_t map);
 void *map_value_for_key(map_t map, const char *key);
 void *map_set_value_for_key(map_t map, const char *key, void *value);
-void *map_remove_key(map_t map, const char *key, void *value);
+void *map_remove_value_for_key(map_t map, const char *key);
 array_t map_keys(map_t map);
 array_t map_values(map_t map);
 
@@ -74,6 +74,7 @@ typedef struct _buffer *buffer_t;
 
 buffer_t buffer_new(int size);
 buffer_t buffer_new_from_data(unsigned char *data, int size);
+buffer_t buffer_new_from_static_data(const unsigned char *data, int size);
 buffer_t buffer_new_from_string(char *string);
 buffer_t buffer_new_from_mpi(mbedtls_mpi *mpi);
 buffer_t buffer_clone(buffer_t buffer);
