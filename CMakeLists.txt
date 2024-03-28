@@ -1,3 +1,3 @@
 idf_component_register(
-        SRCS "collections.c" "dump.c" "mpi.c"
+        SRCS "src/collections.c" "src/dump.c" "src/mpi.c"
         INCLUDE_DIRS "include")
