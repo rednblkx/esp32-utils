@@ -46,7 +46,7 @@ extern "C" {
 
 #include "freertos/FreeRTOS.h"
 #include <string.h>
-#include "mbedtls/bignum.h"
+#include <mbedtls/bignum.h>
 #include "errno.h"
 #include "esp32-utils/collections.h"
 #include "esp32-utils/mpi.h"
